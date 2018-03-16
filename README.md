@@ -44,3 +44,4 @@ import { Object3D, Mesh, MeshBasicMaterial } from THREE
 
 I try to respect the [Standard](https://standardjs.com) coding style.
 # seniorDesign
+# seniorDesign

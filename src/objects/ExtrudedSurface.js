@@ -3,7 +3,7 @@ import { DoubleSide, Object3D, Vector2, Vector3, Matrix4, Mesh, LineCurve, Shape
 import Cube from './Cube'
 
 var surfaceScale = 50;
-var width = 40;
+var width = 70;
 var controlPt = .352284749831;
 
 var xAxis = new Vector2(1,0);
@@ -31,9 +31,10 @@ export default class CubicBezierSurface extends Object3D {
 
     var shape3d = new ExtrudeGeometry(path, extrudeSettings);
 
-    const material = new MeshLambertMaterial({color: 0xff66b3, side: DoubleSide})
+    const material = new MeshLambertMaterial({color: 0x23262D, side: DoubleSide})
     const mesh = new Mesh(shape3d, material);
     mesh.translateZ(-width / 2);
+
 
     this.add(mesh)
   }

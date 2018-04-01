@@ -89,11 +89,19 @@ function generateFloor(floor=1) {
 for (var i = 0; i <= 4; i++) {
   var numFloors = Math.floor((Math.random() * 5) + 1);
   const building = new Building();
-  building.AddFloor(generateFloor());
 
   for (var j = 0; j <= numFloors; j++) {
-    const floor = generateFloor(j+2);
-    building.AddFloor(floor);
+    var randHeight = 3 + Math.floor((Math.random() * 8) + 1);
+
+    var numRooms = Math.floor((Math.random() * 4) + 1);
+
+    for (var r = 0; r <= numRooms; r++) {
+      var randTransX = -2 + (Math.random() * 4);
+      var randTransY = -2 + (Math.random() * 4);
+      building.CreateRoom(randHeight, randTransX, randTransY);
+    }
+
+    building.CreateFloor();
   }
 
   building.translateX(30 * i);

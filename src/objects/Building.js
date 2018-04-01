@@ -1,7 +1,11 @@
 const THREE = require('three');
 const ThreeBSP = require('three-js-csg')(THREE);
-import { FloorMerge } from './BSPBuilding'
+import { FloorMerge, RoomMerge } from './BSPBuilding'
+import Room from './Room'
+import Floor from './Floor'
 
+
+//to create a floor: call CreateRoom with parameters and then call createFloor()
 export default class Building extends THREE.Object3D {
   	constructor () {
 		super()
@@ -35,6 +39,8 @@ export default class Building extends THREE.Object3D {
 
 	}
 
+	//Modify to add room to current mesh. 
+	//Currently takes all rooms in currentRooms and creates a floor
 	CreateFloor () {
 		if (this.currentRooms.length == 1) {
 			this.AddFloor(new Floor(this.currentRooms[0].mesh, this.currentRooms[0].height));
@@ -42,7 +48,7 @@ export default class Building extends THREE.Object3D {
 
 		if (this.currentRooms.length > 1) {
 			var currentMesh = this.currentRooms[0].mesh;
-			
+
 			for (var i = 1; i < this.currentRooms.length; i++) {
 				var currentRoom = this.currentRooms[i];
 				currentMesh = RoomMerge(currentMesh, currentRoom.mesh);

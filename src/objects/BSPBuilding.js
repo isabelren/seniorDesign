@@ -46,6 +46,7 @@ export default class TestCube extends THREE.Object3D {
 	}
 }
 
+//returns a MESH of the merged meshes
 export function RoomMerge(mesh1, mesh2) {
 	const bsp1 = new ThreeBSP(mesh1);
 	const bsp2 = new ThreeBSP(mesh2);
@@ -59,9 +60,7 @@ export function RoomMerge(mesh1, mesh2) {
 
 export function FloorMerge(mesh1, mesh2, height1) {
 	var yTransform = -height1;
-	console.log(yTransform)
 	mesh2.position.set(0,yTransform + 55,0);
-	console.log(mesh2.position)
 
 	const bsp1 = new ThreeBSP(mesh1);
 	const bsp2 = new ThreeBSP(mesh2);

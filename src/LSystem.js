@@ -131,7 +131,7 @@ function replaceNode(linkedList, node, replacementString) {
 
 export default function Lsystem(axiom, grammar, iterations) {
 	// default LSystem
-	this.axiom = "FY";
+	this.axiom = "F";
 	this.grammar = {};
 
 	//f for first floor, rules for single room or multiroom

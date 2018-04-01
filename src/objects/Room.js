@@ -1,7 +1,7 @@
 const THREE = require('three');
 const ThreeBSP = require('three-js-csg')(THREE);
 
-export default class SquareExtrude extends THREE.Object3D {
+export default class Room extends THREE.Object3D {
   	constructor (height, xLength, yLength, s, xTrans, yTrans) {
 		super()
 		this.height = height;
@@ -9,7 +9,7 @@ export default class SquareExtrude extends THREE.Object3D {
 		squareShape.moveTo( xLength / 2, yLength / 2 );
 		squareShape.lineTo( -xLength / 2, yLength / 2);
 		squareShape.lineTo( -xLength / 2, -yLength / 2 );
-		squareShape.lineTo( xLength / 2, -yLength /2);
+		squareShape.lineTo( xLength / 2, -yLength / 2);
 
 		var extrudeSettings = { amount: height, bevelEnabled: false, steps: 2};
 
@@ -19,7 +19,7 @@ export default class SquareExtrude extends THREE.Object3D {
 		var mesh = new THREE.Mesh( geometry );
 		mesh.rotation.set(Math.PI / 2, 0, 0);
     	mesh.position.set(xTrans, 55, yTrans);
-    	mesh.scale.set(s, s, s);
+    	//mesh.scale.set(s, s, s);
     	this.mesh = mesh
 		this.add(mesh)
 	}

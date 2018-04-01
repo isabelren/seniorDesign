@@ -9,7 +9,7 @@ import Cube from './objects/Cube'
 import Cube2 from './objects/Cube2'
 import Floor from './objects/Floor'
 import Building from './objects/Building'
-import SquareExtrude from './objects/SquareExtrude'
+import Room from './objects/Room'
 import TestCube from './objects/TestCube'
 import { BSPBuilding, RoomMerge, FloorMerge } from './objects/BSPBuilding'
 import OrbitControls from './controls/OrbitControls'
@@ -63,14 +63,57 @@ backLight.position.set(-30, 70, 25)
 lowLight.position.set(60, 40, 0)
 
 /* Actual content of the scene */
-addObjectsToScene(scene);
+//addObjectsToScene(scene);
 
-const mesh1 = new SquareExtrude(8, 1, 3, 1, 0, 0);
-const mesh2 = new SquareExtrude(4, 4, 4, 1, 0, 0);
-console.log(mesh1.height)
-var test = FloorMerge(mesh1.mesh, mesh2.mesh, mesh1.height);
-var floor = new Floor(test, mesh1.height + mesh2.height)
-scene.add(floor)
+
+//parameters - max height, min height
+//scale (determined by max and min height?)
+
+function generateRoom(height, scale=1, xTrans = 0, yTrans = 0, minHeight = 0, maxHeight = 4) {
+  var xLength = scale + Math.floor((Math.random() * 4 * scale) + 1);
+  var yLength = scale + Math.floor((Math.random() * 4 * scale) + 1);
+  return new Room(height, xLength, yLength, 1, xTrans, yTrans);
+}
+
+//invoked at the end of each LSystem
+//number of rooms, height
+//loop through number of rooms
+//list of Transform objects (MAKE TRANSFORM OBJECT! to hold translation and x/y scales)
+function generateFloor(floor=1) {
+  var randHeight = 3 + Math.floor((Math.random() * 8) + 1);
+  const room1 = generateRoom(randHeight, floor);
+  const room2 = generateRoom(randHeight, floor, 0.5, 0.5);
+  return new Floor(RoomMerge(room1.mesh, room2.mesh), randHeight);
+}
+
+for (var i = 0; i <= 4; i++) {
+  var numFloors = Math.floor((Math.random() * 5) + 1);
+  const building = new Building();
+  building.AddFloor(generateFloor());
+
+  for (var j = 0; j <= numFloors; j++) {
+    const floor = generateFloor(j+2);
+    building.AddFloor(floor);
+  }
+
+  building.translateX(30 * i);
+  
+  scene.add(building)
+}
+
+/*
+const floorRoom1 = new Room(4, 1, 3, 1, 0, 0);
+const floorRoom2 = new Room(4, 2, 1, 1, 0.5, 0.5);
+const floor1 = new Floor(RoomMerge(floorRoom1.mesh, floorRoom2.mesh), 4);
+
+const building = new Building(floor1);
+
+const floorMesh3 = new Room(4, 4, 3, 1, 0, 0);
+const floorMesh4 = new Room(4, 2, 3, 1, 0.5, 3);
+const floor2 = new Floor(RoomMerge(floorMesh3.mesh, floorMesh4.mesh), 4);
+
+building.AddFloor(floor2)
+scene.add(building)*/
 
 
 /* Various event listeners */

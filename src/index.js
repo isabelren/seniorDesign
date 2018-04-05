@@ -86,25 +86,48 @@ function generateFloor(floor=1) {
   return new Floor(RoomMerge(room1.mesh, room2.mesh), randHeight);
 }
 
-for (var i = 0; i <= 4; i++) {
-  var numFloors = Math.floor((Math.random() * 5) + 1);
+//generate number of floors
+var numFloors = Math.floor((Math.random() * 5) + 1);
+
+
+//generate height of each floor in an array
+
+// iteratively add a room
+
+for (var buildingNum = 0; buildingNum <= 4; buildingNum++) {
+  var lowerFloorBound = 1
+  var upperFloorBound = 5
+
+  var lowerHeightBound = 1;
+  var upperHeightBound = 8;
+
   const building = new Building();
 
-  for (var j = 0; j <= numFloors; j++) {
-    var randHeight = 3 + Math.floor((Math.random() * 8) + 1);
+  //generate number of floors
+  var numFloors = Math.floor((Math.random() * upperFloorBound) + lowerFloorBound);
 
-    var numRooms = Math.floor((Math.random() * 4) + 1);
-
-    for (var r = 0; r <= numRooms; r++) {
-      var randTransX = -2 + (Math.random() * 4);
-      var randTransY = -2 + (Math.random() * 4);
-      building.CreateRoom(randHeight, randTransX, randTransY);
-    }
-
-    building.CreateFloor();
+  //generate height of each floor in an array
+  var floorHeights = [];
+  var totalHeight = 0;
+  for (var i = 0; i < numFloors; i++) {
+    var newHeight = lowerHeightBound + Math.floor((Math.random() * upperHeightBound));
+    floorHeights.push(newHeight);
+    totalHeight += newHeight;
   }
 
-  building.translateX(30 * i);
+  var currentHeight = totalHeight;
+
+  // iteratively add a room
+  for (var j = numFloors - 1; j >= 0; j--) {
+    var randTransX = -2 + (Math.random() * 4);
+      var randTransY = -2 + (Math.random() * 4);
+      building.CreateRoom(currentHeight, randTransX, randTransY, totalHeight - currentHeight);
+      currentHeight -= floorHeights[j];
+  }
+
+  building.CreateBuildingFromRooms()
+
+  building.translateX(-150 + 30 * buildingNum);
   
   scene.add(building)
 }

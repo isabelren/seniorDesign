@@ -72,3 +72,31 @@ export function FloorMerge(mesh1, mesh2, height1) {
 	return newMesh;
 
 }
+
+export function MeshSubtract(currentHeight, goalHeight, mesh) {
+	const duplicateMesh = mesh.clone()
+	duplicateMesh.position.y = duplicateMesh.position.y - goalHeight;
+
+	const bsp = new ThreeBSP(mesh);
+	const duplicate = new ThreeBSP(duplicateMesh);
+	const bsp2 = bsp.subtract(duplicate);
+	const newMesh = bsp2.toMesh();
+	const material = new THREE.MeshLambertMaterial({color: 0xffcccc, side: THREE.DoubleSide})
+
+	newMesh.material = material;
+	return newMesh;
+}
+
+export function MeshIncrease(currentHeight, goalHeight, mesh) {
+	const duplicateMesh = mesh.clone()
+	duplicateMesh.position.y = duplicateMesh.position.y - goalHeight;
+
+	const bsp = new ThreeBSP(mesh);
+	const duplicate = new ThreeBSP(duplicateMesh);
+	const bsp2 = bsp.union(duplicate);
+	const newMesh = bsp2.toMesh();
+	const material = new THREE.MeshLambertMaterial({color: 0xffcccc, side: THREE.DoubleSide})
+
+	newMesh.material = material;
+	return newMesh;
+}

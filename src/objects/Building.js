@@ -1,6 +1,6 @@
 const THREE = require('three');
 const ThreeBSP = require('three-js-csg')(THREE);
-import { FloorMerge, RoomMerge } from './BSPBuilding'
+import { FloorMerge, RoomMerge, MeshSubtract } from './BSPBuilding'
 import Room from './Room'
 import Floor from './Floor'
 
@@ -17,7 +17,7 @@ export default class Building extends THREE.Object3D {
 	}
 
 	AddFloor (newFloor) {
-		this.floors.push(newFloor.mesh)
+		this.floors.push(newFloor)
 
 		if (this.mesh) {
 			this.RemoveCurrentMeshAndMerge(newFloor)
@@ -41,7 +41,7 @@ export default class Building extends THREE.Object3D {
 
 	//Modify to add room to current mesh. 
 	//Currently takes all rooms in currentRooms and creates a floor
-	CreateFloor () {
+	CreateFloorFromRooms () {
 		if (this.currentRooms.length == 1) {
 			this.AddFloor(new Floor(this.currentRooms[0].mesh, this.currentRooms[0].height));
 		}
@@ -61,10 +61,71 @@ export default class Building extends THREE.Object3D {
 
 	}
 
-	CreateRoom (height, xTrans, yTrans, scale=1, minHeight = 0, maxHeight = 4, minLength = 0) {
+	CreateBuildingFromRooms () {
+
+		if (this.currentRooms.length > 1) {
+			var currentMesh = this.currentRooms[0].mesh;
+
+			for (var i = 1; i < this.currentRooms.length; i++) {
+				var currentRoom = this.currentRooms[i];
+				currentMesh = RoomMerge(currentMesh, currentRoom.mesh);
+			}
+			
+			if (this.mesh) {
+				this.remove(this.mesh);
+
+				const newBuildingMesh = currentMesh;
+				this.add(newBuildingMesh)
+				this.mesh = newBuildingMesh
+			} else { //Add first floor
+				this.add(currentMesh);
+				this.mesh = currentMesh;
+			}
+			//this.AddFloor(new Floor(currentMesh, this.currentRooms[0].height))
+		}
+
+		this.currentRooms = []
+	}
+
+	CreateFloorFromPreviousFloor () {
+		if (this.floors.length > 0) {
+			this.CheckHeightAndSubtract();
+			var currentMesh = this.floors[this.floors.length - 1].mesh;
+
+			for (var i = 0; i < this.currentRooms.length; i++) {
+				var currentRoom = this.currentRooms[i];
+				currentMesh = RoomMerge(currentMesh, currentRoom.mesh);
+			}
+
+			this.AddFloor(new Floor(currentMesh, this.currentRooms[0].height))
+			this.currentRooms = []
+		} else {
+			this.CreateFloorFromRooms()
+		}
+
+	}
+
+	CheckHeightAndSubtract() {
+		var goalHeight = this.currentRooms[this.currentRooms.length - 1].height;
+		var floorHeight = this.floors[this.floors.length - 1].height;
+		if (goalHeight > floorHeight) {
+			console.log("h")
+			//TODO: must increase floorHeight through union
+		}
+
+		if (floorHeight > goalHeight) {
+			//must decrease floorHeight
+			console.log("i")
+			this.floors[this.floors.length - 1].mesh = MeshSubtract(floorHeight, goalHeight, this.floors[this.floors.length - 1].mesh)
+
+		}
+
+	}
+
+	CreateRoom (height, xTrans, yTrans, heightTrans, scale=1, minHeight = 0, maxHeight = 4, minLength = 0) {
 		var xLength = minLength + Math.floor((Math.random() * 4 * scale) + 1);
   		var yLength = minLength + Math.floor((Math.random() * 4 * scale) + 1);
-  		this.currentRooms.push(new Room(height, xLength, yLength, 1, xTrans, yTrans));
+  		this.currentRooms.push(new Room(height, xLength, yLength, 1, xTrans, yTrans, heightTrans));
 
 	}
 }

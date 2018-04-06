@@ -18,7 +18,7 @@ export default class Room extends THREE.Object3D {
 		const material = new THREE.MeshLambertMaterial({color: 0xffcccc, side: THREE.DoubleSide})
 		var mesh = new THREE.Mesh( geometry );
 		mesh.rotation.set(Math.PI / 2, 0, 0);
-    	mesh.position.set(xTrans, 55 - heightTrans, yTrans);
+    	mesh.position.set(xTrans, 0, yTrans);
     	//mesh.scale.set(s, s, s);
     	this.mesh = mesh
 		this.add(mesh)

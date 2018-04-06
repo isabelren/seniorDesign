@@ -78,7 +78,9 @@ export function stringToLinkedList(input_string) {
 			tailNode = newNode;
 			prev.next = newNode;
 			prev = newNode;
+			
 		}
+
 	}
 
 	var ll = new LinkedList(headNode, tailNode);
@@ -86,7 +88,7 @@ export function stringToLinkedList(input_string) {
 }
 
 // Return a string form of the LinkedList
-export function linkedListToString(linkedList) {
+export function LinkedListToString(linkedList) {
 	// ex. Node1("F")->Node2("X") should be "FX"
 	var result = "";
 	var currNode = linkedList.head;
@@ -100,29 +102,33 @@ export function linkedListToString(linkedList) {
 // Given the node to be replaced, 
 // insert a sub-linked-list that represents replacementString
 function replaceNode(linkedList, node, replacementString) {
-	var subLinkedList = stringToLinkedList(replacementString);
 
+	var subLinkedList = stringToLinkedList(replacementString);
 	// edge case: single axiom
 	if (linkedList.head === linkedList.tail) {
 		linkedList.head = subLinkedList.head; 
+		linkedList.tail = subLinkedList.tail;
 	} else {
 		// find the place of node in linkedList
 		var curr = linkedList.head;
 		while (curr) {
 			if (curr === node) {
-				// Replace old node with the new subLinkedList.
-				if (curr !== linkedList.head) {
-					// if current node is not at head, then set curr's previous's next appropriately
-					// else, then the sublinkedlist is at the head of the Node
+
+				if (curr.prev) {
 					curr.prev.next = subLinkedList.head;
+					subLinkedList.head.prev = curr.prev;
+				} else { //is head
+					linkedList.head = subLinkedList.head
 				}
-				// set the previous of the to be the old node's previous 
-				subLinkedList.prev = curr.prev; 
+
 				if (curr.next) {
-					// if it's in the middle of the linked list, set the next to the current's next
-					// else, the tail next will default point to null 
-					subLinkedList.tail.next = curr.next;
+					curr.next.prev = subLinkedList.tail;
+				} else { //is tail
+					linkedList.tail = subLinkedList.tail;
 				}
+
+				subLinkedList.head.prev = curr.prev;
+				subLinkedList.tail.next = curr.next;
 			}
 			curr = curr.next;
 		}
@@ -131,46 +137,55 @@ function replaceNode(linkedList, node, replacementString) {
 
 export default function Lsystem(axiom, grammar, iterations) {
 	// default LSystem
-	this.axiom = "F";
+	this.axiom = "FML";
 	this.grammar = {};
 
 	//f for first floor, rules for single room or multiroom
 	//S and M
 	this.grammar['F'] = [
-		new Rule(0.6, 'S'),
-		new Rule(0.4, 'M')
+		new Rule(0.6, 'R'),
+		new Rule(0.4, 'A')
 	]
 
 	this.grammar['M'] = [
-		new Rule(0.7, 'S'),
-		new Rule(0.3, 'M')
+		new Rule(0.7, 'R'),
+		new Rule(0.3, 'SA')
 	]
 
 	this.grammar['L'] = [
-		new Rule(0.8, 'S'),
-		new Rule(0.2, 'M')
+		new Rule(0.8, 'R'),
+		new Rule(0.2, 'SSA')
 	]
 
-	//Single room with one transformation vs 2
-	this.grammar['S'] = [
-		new Rule(0.6, 'SC'),
-		new Rule(0.4, 'SCC')
+	//Multi room, A adds another room
+	this.grammar['A'] = [
+		new Rule(0.6, 'CCA'),
+		new Rule(0.3, 'CCCA'),
+		new Rule(0.1, 'CCCCA')
 	]
 
-	//Multi room with
-	this.grammar['M'] = [
-		new Rule(0.6, 'CMC'),
-		new Rule(0.3, 'CMCC'),
-		new Rule(0.1, 'CCMCC')
+	this.grammar['R'] = [
+		new Rule(0.6, 'CCR'),
+		new Rule(0.3, 'CCCR'),
+		new Rule(0.1, 'CCCCR')
 	]
 
 	this.grammar['C'] = [
-		new Rule(0.15, 'X'),
-		new Rule(0.15, 'Y'),
-		new Rule(0.15, 'x'),
-		new Rule(0.15, 'y'),
-		new Rule(0.2, 'T'),
-		new Rule(0.2, 'RT')
+		new Rule(0.05, 'T'),
+		new Rule(0.9, 'S'),
+	]
+
+	this.grammar['T'] = [
+		new Rule(0.25, 'X'),
+		new Rule(0.25, 'Y'),
+		new Rule(0.25, 'x'),
+		new Rule(0.25, 'y'),
+	]
+	this.grammar['S'] = [
+		new Rule(0.05, 'u'),
+		new Rule(0.45, 'U'),
+		new Rule(0.05, 'v'),
+		new Rule(0.45, 'V'),
 	]
 
 	//m for middle floor
@@ -180,10 +195,10 @@ export default function Lsystem(axiom, grammar, iterations) {
 	//T is translate
 	//R is switch current translate axis
 	//E is extrude
-	//X is increase scale x
-	//Y is increase scale y
-	//x is half scale x
-	//y is half scale y
+	//X is increase x trans
+	//Y is increase y trans
+	//x is decrease x trans
+	//y is decrease y trans
 
 	this.iterations = 0; 
 	
@@ -227,18 +242,28 @@ export default function Lsystem(axiom, grammar, iterations) {
 			// convert original string to nodes
 			var lSystemLL = stringToLinkedList(origString);
 
+
 			for (var i = 0; i < n; i++) {
-				// console.log("hi");
 				// iterate through the linked list n times
 				var currNode = lSystemLL.head;
+
+				
+
 				while (currNode) {
 					// check if the currNode sym has any listings in grammar
+
 					if (this.grammar[currNode.sym]) {
 						// then findReplace what string should replace the current node
 						var replacementString = findReplace(currNode, lSystemLL, this.grammar);
-
 						// then replaceNode with the new string
 						replaceNode(lSystemLL, currNode, replacementString); 
+						
+						/*
+						var curr = lSystemLL.head
+						while (curr != null) {
+							console.log(curr.sym)
+							curr = curr.next
+						}*/
 					}
 					// go onto the next node
 					currNode = currNode.next; 

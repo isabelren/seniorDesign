@@ -17,6 +17,8 @@ import { gui } from './utils/debug'
 import ExtrudedSurface from './objects/ExtrudedSurface'
 import createGraph from './objects/ParametricSurface'
 import CubePath from './objects/CubePath'
+import Lsystem, {LinkedListToString} from './LSystem'
+import Turtle from './turtle'
 
 
 var uMax = .85;
@@ -65,87 +67,67 @@ lowLight.position.set(60, 40, 0)
 /* Actual content of the scene */
 //addObjectsToScene(scene);
 
+var lsys = new Lsystem();
+var turtle = new Turtle();
+//doLsystem(lsys, 6, turtle);
 
-//parameters - max height, min height
-//scale (determined by max and min height?)
+//turtle will create a building given number of floors and heights. each floor is a new room
+//each building will have at least 3 floors
+//rules for room transformations
+//rules for room size
+//rules for kinds of rooms
 
-function generateRoom(height, scale=1, xTrans = 0, yTrans = 0, minHeight = 0, maxHeight = 4) {
-  var xLength = scale + Math.floor((Math.random() * 4 * scale) + 1);
-  var yLength = scale + Math.floor((Math.random() * 4 * scale) + 1);
-  return new Room(height, xLength, yLength, 1, xTrans, yTrans);
+function doLsystem(lsystem, iterations, turtle) {
+    var result = lsystem.doIterations(iterations);
+    console.log(LinkedListToString(result))
+    turtle.renderSymbols(result);
+    var building = turtle.getAndResetBuilding()
+    building.CreateBuildingFromRooms();
+    return building;
 }
 
-//invoked at the end of each LSystem
-//number of rooms, height
-//loop through number of rooms
-//list of Transform objects (MAKE TRANSFORM OBJECT! to hold translation and x/y scales)
-function generateFloor(floor=1) {
-  var randHeight = 3 + Math.floor((Math.random() * 8) + 1);
-  const room1 = generateRoom(randHeight, floor);
-  const room2 = generateRoom(randHeight, floor, 0.5, 0.5);
-  return new Floor(RoomMerge(room1.mesh, room2.mesh), randHeight);
-}
-
-//generate number of floors
-var numFloors = Math.floor((Math.random() * 5) + 1);
-
-
-//generate height of each floor in an array
 
 // iteratively add a room
+for (var buildingNum = 0; buildingNum <= 5; buildingNum++) {
+    /*var lowerFloorBound = 3
+    var upperFloorBound = 8
 
-for (var buildingNum = 0; buildingNum <= 4; buildingNum++) {
-  var lowerFloorBound = 1
-  var upperFloorBound = 5
+    var lowerHeightBound = 1;
+    var upperHeightBound = 8;
 
-  var lowerHeightBound = 1;
-  var upperHeightBound = 8;
+    //generate number of floors
+    var numFloors = Math.floor((Math.random() * upperFloorBound) + lowerFloorBound);
 
-  const building = new Building();
+    //generate height of each floor in an array
+    var floorHeights = [];
+    var totalHeight = 0;
+    for (var i = 0; i < numFloors; i++) {
+      var newHeight = lowerHeightBound + Math.floor((Math.random() * upperHeightBound));
+      floorHeights.push(newHeight);
+      totalHeight += newHeight;
+    }
 
-  //generate number of floors
-  var numFloors = Math.floor((Math.random() * upperFloorBound) + lowerFloorBound);
+    const building = new Building(floorHeights, totalHeight);
 
-  //generate height of each floor in an array
-  var floorHeights = [];
-  var totalHeight = 0;
-  for (var i = 0; i < numFloors; i++) {
-    var newHeight = lowerHeightBound + Math.floor((Math.random() * upperHeightBound));
-    floorHeights.push(newHeight);
-    totalHeight += newHeight;
-  }
+    var currentHeight = totalHeight;
 
-  var currentHeight = totalHeight;
+    // iteratively add a room
+    for (var j = numFloors - 1; j >= 0; j--) {
+        var randTransX = -2 + (Math.random() * 4);
+        var randTransY = -2 + (Math.random() * 4);
+        building.CreateRoom(currentHeight, randTransX, randTransY, totalHeight - currentHeight);
+        currentHeight -= floorHeights[j];
+    }
 
-  // iteratively add a room
-  for (var j = numFloors - 1; j >= 0; j--) {
-    var randTransX = -2 + (Math.random() * 4);
-      var randTransY = -2 + (Math.random() * 4);
-      building.CreateRoom(currentHeight, randTransX, randTransY, totalHeight - currentHeight);
-      currentHeight -= floorHeights[j];
-  }
+    building.CreateBuildingFromRooms()*/
+    var building = doLsystem(lsys, 6, turtle);
+    building.translateX(-150 + 30 * buildingNum);
+    building.translateY(55);
+    console.log(building.rotation)
 
-  building.CreateBuildingFromRooms()
-
-  building.translateX(-150 + 30 * buildingNum);
-  
-  scene.add(building)
+    
+    scene.add(building)
 }
-
-/*
-const floorRoom1 = new Room(4, 1, 3, 1, 0, 0);
-const floorRoom2 = new Room(4, 2, 1, 1, 0.5, 0.5);
-const floor1 = new Floor(RoomMerge(floorRoom1.mesh, floorRoom2.mesh), 4);
-
-const building = new Building(floor1);
-
-const floorMesh3 = new Room(4, 4, 3, 1, 0, 0);
-const floorMesh4 = new Room(4, 2, 3, 1, 0.5, 3);
-const floor2 = new Floor(RoomMerge(floorMesh3.mesh, floorMesh4.mesh), 4);
-
-building.AddFloor(floor2)
-scene.add(building)*/
-
 
 /* Various event listeners */
 resize.addListener(onResize)
@@ -193,6 +175,8 @@ function render (dt) {
     renderer.render(scene, camera)
   }
 }
+
+
 
 function loopAndUpdatePositions(scene) {
   for (var i = 0; i < scene.children.length; i++) {

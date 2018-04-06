@@ -7,58 +7,54 @@ import Floor from './Floor'
 
 //to create a floor: call CreateRoom with parameters and then call createFloor()
 export default class Building extends THREE.Object3D {
-  	constructor () {
+  	constructor (floorHeights=[], totalHeight=0) {
 		super()
-		this.heights = [];
-		this.height = 0;
-		this.floors = [];
+		this.floorHeights = floorHeights;
+		this.totalHeight = totalHeight;
+
+		if (floorHeights.length == 0) {
+			this.AutoGenerateFloorHeights();
+		}
+
 		this.currentRooms = []
 		//TODO: store max x trans and max y trans
 	}
 
-	AddFloor (newFloor) {
-		this.floors.push(newFloor)
+	//TODO: can store heights in turtle?
+	AutoGenerateFloorHeights() {
+		var lowerFloorBound = 3
+	    var upperFloorBound = 8
 
+	    var lowerHeightBound = 1;
+	    var upperHeightBound = 8;
+
+	    //generate number of floors
+	    var numFloors = Math.floor((Math.random() * upperFloorBound) + lowerFloorBound);
+
+	    //generate height of each floor in an array
+	    var floorHeights = [];
+	    var totalHeight = 0;
+	    for (var i = 0; i < numFloors; i++) {
+	      var newHeight = lowerHeightBound + Math.floor((Math.random() * upperHeightBound));
+	      floorHeights.push(newHeight);
+	      totalHeight += newHeight;
+	    }
+	    this.floorHeights = floorHeights;
+	    this.totalHeight = totalHeight;
+
+	}
+
+	RemoveAndReplaceMesh(newMesh) {
 		if (this.mesh) {
-			this.RemoveCurrentMeshAndMerge(newFloor)
+			this.remove(this.mesh);
+
+			const newBuildingMesh = newMesh;
+			this.add(newBuildingMesh)
+			this.mesh = newBuildingMesh
 		} else { //Add first floor
-			this.add(newFloor);
-			this.mesh = newFloor.mesh;
+			this.add(newMesh);
+			this.mesh = newMesh;
 		}
-		
-		this.height = this.height + newFloor.height;
-		
-	}
-
-	RemoveCurrentMeshAndMerge(newFloor) {
-		this.remove(this.mesh);
-
-		const newBuildingMesh = FloorMerge(this.mesh, newFloor.mesh, this.height);
-		this.add(newBuildingMesh)
-		this.mesh = newBuildingMesh
-
-	}
-
-	//Modify to add room to current mesh. 
-	//Currently takes all rooms in currentRooms and creates a floor
-	CreateFloorFromRooms () {
-		if (this.currentRooms.length == 1) {
-			this.AddFloor(new Floor(this.currentRooms[0].mesh, this.currentRooms[0].height));
-		}
-
-		if (this.currentRooms.length > 1) {
-			var currentMesh = this.currentRooms[0].mesh;
-
-			for (var i = 1; i < this.currentRooms.length; i++) {
-				var currentRoom = this.currentRooms[i];
-				currentMesh = RoomMerge(currentMesh, currentRoom.mesh);
-			}
-
-			this.AddFloor(new Floor(currentMesh, this.currentRooms[0].height))
-		}
-
-		this.currentRooms = []
-
 	}
 
 	CreateBuildingFromRooms () {
@@ -70,57 +66,16 @@ export default class Building extends THREE.Object3D {
 				var currentRoom = this.currentRooms[i];
 				currentMesh = RoomMerge(currentMesh, currentRoom.mesh);
 			}
-			
-			if (this.mesh) {
-				this.remove(this.mesh);
+			currentMesh.rotation.set(-Math.PI / 2, 0, 0);
 
-				const newBuildingMesh = currentMesh;
-				this.add(newBuildingMesh)
-				this.mesh = newBuildingMesh
-			} else { //Add first floor
-				this.add(currentMesh);
-				this.mesh = currentMesh;
-			}
-			//this.AddFloor(new Floor(currentMesh, this.currentRooms[0].height))
+			this.RemoveAndReplaceMesh(currentMesh)
 		}
+
+
 
 		this.currentRooms = []
 	}
 
-	CreateFloorFromPreviousFloor () {
-		if (this.floors.length > 0) {
-			this.CheckHeightAndSubtract();
-			var currentMesh = this.floors[this.floors.length - 1].mesh;
-
-			for (var i = 0; i < this.currentRooms.length; i++) {
-				var currentRoom = this.currentRooms[i];
-				currentMesh = RoomMerge(currentMesh, currentRoom.mesh);
-			}
-
-			this.AddFloor(new Floor(currentMesh, this.currentRooms[0].height))
-			this.currentRooms = []
-		} else {
-			this.CreateFloorFromRooms()
-		}
-
-	}
-
-	CheckHeightAndSubtract() {
-		var goalHeight = this.currentRooms[this.currentRooms.length - 1].height;
-		var floorHeight = this.floors[this.floors.length - 1].height;
-		if (goalHeight > floorHeight) {
-			console.log("h")
-			//TODO: must increase floorHeight through union
-		}
-
-		if (floorHeight > goalHeight) {
-			//must decrease floorHeight
-			console.log("i")
-			this.floors[this.floors.length - 1].mesh = MeshSubtract(floorHeight, goalHeight, this.floors[this.floors.length - 1].mesh)
-
-		}
-
-	}
 
 	CreateRoom (height, xTrans, yTrans, heightTrans, scale=1, minHeight = 0, maxHeight = 4, minLength = 0) {
 		var xLength = minLength + Math.floor((Math.random() * 4 * scale) + 1);

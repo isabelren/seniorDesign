@@ -22,7 +22,7 @@ import Turtle from './turtle'
 
 
 var uMax = .85;
-var numCubes = 30;
+var numCubes = 10;
 var boost = 0;
 
 /* Custom settings */
@@ -64,12 +64,13 @@ frontLight.position.set(30, 70, -25)
 backLight.position.set(-30, 70, 25)
 lowLight.position.set(60, 40, 0)
 
-/* Actual content of the scene */
-//addObjectsToScene(scene);
+
 
 var lsys = new Lsystem();
 var turtle = new Turtle();
-//doLsystem(lsys, 6, turtle);
+
+/* Actual content of the scene */
+addObjectsToScene(scene, lsys);
 
 //turtle will create a building given number of floors and heights. each floor is a new room
 //each building will have at least 3 floors
@@ -84,49 +85,6 @@ function doLsystem(lsystem, iterations, turtle) {
     var building = turtle.getAndResetBuilding()
     building.CreateBuildingFromRooms();
     return building;
-}
-
-
-// iteratively add a room
-for (var buildingNum = 0; buildingNum <= 5; buildingNum++) {
-    /*var lowerFloorBound = 3
-    var upperFloorBound = 8
-
-    var lowerHeightBound = 1;
-    var upperHeightBound = 8;
-
-    //generate number of floors
-    var numFloors = Math.floor((Math.random() * upperFloorBound) + lowerFloorBound);
-
-    //generate height of each floor in an array
-    var floorHeights = [];
-    var totalHeight = 0;
-    for (var i = 0; i < numFloors; i++) {
-      var newHeight = lowerHeightBound + Math.floor((Math.random() * upperHeightBound));
-      floorHeights.push(newHeight);
-      totalHeight += newHeight;
-    }
-
-    const building = new Building(floorHeights, totalHeight);
-
-    var currentHeight = totalHeight;
-
-    // iteratively add a room
-    for (var j = numFloors - 1; j >= 0; j--) {
-        var randTransX = -2 + (Math.random() * 4);
-        var randTransY = -2 + (Math.random() * 4);
-        building.CreateRoom(currentHeight, randTransX, randTransY, totalHeight - currentHeight);
-        currentHeight -= floorHeights[j];
-    }
-
-    building.CreateBuildingFromRooms()*/
-    var building = doLsystem(lsys, 6, turtle);
-    building.translateX(-150 + 30 * buildingNum);
-    building.translateY(55);
-    console.log(building.rotation)
-
-    
-    scene.add(building)
 }
 
 /* Various event listeners */
@@ -158,7 +116,7 @@ function render (dt) {
   controls.update()
 
 
-  //loopAndUpdatePositions(scene);
+  loopAndUpdatePositions(scene);
   if (boost != 0) {
     var boostPercentage = ((100 - (boost * .8)) / 110) * 4
     loopAndUpdateColor(scene, boostPercentage);
@@ -204,36 +162,30 @@ function loopAndUpdateColor(scene, boostPercentage) {
   }
 }
 
-function addObjectsToScene(scene) {
+function addObjectsToScene(scene, lsys) {
   var surface = new ExtrudedSurface();
 
-  var cubePathL = new CubePath(-5);
-  var cubePathR = new CubePath(5);
+  var cubePathL = new CubePath(-8);
+  var cubePathR = new CubePath(8);
 
   // Uncomment to add paths to scene
-  //scene.add(cubePathR);
-  //scene.add(cubePathL);
+  scene.add(cubePathR);
+  scene.add(cubePathL);
 
   for (var i = 0; i < numCubes; i++) {
+
     var u = i/ (numCubes-1);
     if (u < uMax) {
-      if (i % 2 == 0) {
-        var lHeight = generateHeight();
-        var cubeL = new Cube(lHeight, cubePathL, u, uMax);
-        scene.add(cubeL)
+      var building1 = doLsystem(lsys, 6, turtle);
+      var building2 = doLsystem(lsys, 6, turtle);
+      var lHeight = generateHeight();
+      var cubeL = new Cube(lHeight, cubePathL, u, uMax, building1);
+      scene.add(cubeL)
 
-        var rHeight = generateHeight();
-        var cubeR = new Cube(rHeight, cubePathR, u, uMax);
-        scene.add(cubeR)
-      } else {
-        var lHeight = generateHeight();
-        var cubeL = new Cube2(lHeight, cubePathL, u, uMax, -1);
-        scene.add(cubeL)
-
-        var rHeight = generateHeight();
-        var cubeR = new Cube2(rHeight, cubePathR, u, uMax, 1);
-        scene.add(cubeR)
-      }
+      var rHeight = generateHeight();
+      var cubeR = new Cube(rHeight, cubePathR, u, uMax, building2);
+      scene.add(cubeR)
+      
       
     } else {
       break;

@@ -67,6 +67,9 @@ export default class Building extends THREE.Object3D {
 				currentMesh = RoomMerge(currentMesh, currentRoom.mesh);
 			}
 			currentMesh.rotation.set(-Math.PI / 2, 0, 0);
+			currentMesh.position.set(0,0,0);
+			const material = new THREE.MeshLambertMaterial({color: 0xffcccc, side: THREE.DoubleSide})
+      		currentMesh.material = material;
 
 			this.RemoveAndReplaceMesh(currentMesh)
 		}

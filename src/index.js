@@ -24,6 +24,7 @@ import Turtle from './turtle'
 var uMax = .85;
 var numCubes = 10;
 var boost = 0;
+var cubeArr = [];
 
 /* Custom settings */
 const SETTINGS = {
@@ -116,7 +117,8 @@ function render (dt) {
   controls.update()
 
 
-  loopAndUpdatePositions(scene);
+  //loopAndUpdatePositions(scene);
+  loopVisibleMesh();
   if (boost != 0) {
     var boostPercentage = ((100 - (boost * .8)) / 110) * 4
     loopAndUpdateColor(scene, boostPercentage);
@@ -134,7 +136,11 @@ function render (dt) {
   }
 }
 
-
+function loopVisibleMesh() {
+    for (var cInd = 0; cInd < cubeArr.length; cInd++) {
+      cubeArr[cInd].incrementU();
+    }
+}
 
 function loopAndUpdatePositions(scene) {
   for (var i = 0; i < scene.children.length; i++) {
@@ -169,8 +175,8 @@ function addObjectsToScene(scene, lsys) {
   var cubePathR = new CubePath(8);
 
   // Uncomment to add paths to scene
-  scene.add(cubePathR);
-  scene.add(cubePathL);
+  //scene.add(cubePathR);
+  //scene.add(cubePathL);
 
   for (var i = 0; i < numCubes; i++) {
 
@@ -185,6 +191,9 @@ function addObjectsToScene(scene, lsys) {
       var rHeight = generateHeight();
       var cubeR = new Cube(rHeight, cubePathR, u, uMax, building2);
       scene.add(cubeR)
+
+      cubeArr.push(cubeL);
+      cubeArr.push(cubeR);
       
       
     } else {

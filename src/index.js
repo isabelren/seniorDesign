@@ -8,6 +8,7 @@ import Cube from './objects/Cube'
 import Floor from './objects/Floor'
 import Building from './objects/Building'
 import Room from './objects/Room'
+import Torus from './objects/Torus'
 import { BSPBuilding, RoomMerge, FloorMerge } from './objects/BSPBuilding'
 import OrbitControls from './controls/OrbitControls'
 import { gui } from './utils/debug'
@@ -55,9 +56,17 @@ const controls = new OrbitControls(camera, {element: renderer.domElement, parent
 const frontLight = new PointLight(0xFFFFFF, 3, 100)
 const backLight = new PointLight(0xFFFFFF, 3, 100)
 const lowLight =  new PointLight(0xFFFFFF, 1, 100)
-scene.add(frontLight)
+
+
+scene.add(frontLight);
 scene.add(backLight)
 scene.add(lowLight)
+
+
+var t = new Torus();
+scene.add(t)
+t.position.set(55, 50, 0);
+
 frontLight.position.set(30, 70, -25)
 backLight.position.set(-30, 70, 25)
 lowLight.position.set(60, 40, 0)
@@ -113,12 +122,11 @@ function onResize () {
 function render (dt) {
   controls.update()
 
-
-  //loopAndUpdatePositions(scene);
-  loopVisibleMesh();
   if (boost != 0) {
     var boostPercentage = ((100 - (boost * .8)) / 110) * 4
     loopAndUpdateColor(scene, boostPercentage);
+  } else {
+    loopAndUpdatePositions(scene);
   }
   
 
@@ -133,35 +141,16 @@ function render (dt) {
   }
 }
 
-function loopVisibleMesh() {
-    for (var cInd = 0; cInd < cubeArr.length; cInd++) {
-      cubeArr[cInd].incrementU();
-    }
-}
 
 function loopAndUpdatePositions(scene) {
-  for (var i = 0; i < scene.children.length; i++) {
-    if (scene.children[i] instanceof Cube) {
-      Cube.prototype.incrementU.call(scene.children[i]);
-
-    }
-    if (scene.children[i] instanceof Cube2) {
-      Cube2.prototype.incrementU.call(scene.children[i]);
-
-    }
+  for (var cInd = 0; cInd < cubeArr.length; cInd++) {
+      cubeArr[cInd].incrementU();
   }
 }
 
 function loopAndUpdateColor(scene, boostPercentage) {
-  for (var i = 0; i < scene.children.length; i++) {
-    if (scene.children[i] instanceof Cube) {
-      Cube.prototype.changeColor.call(scene.children[i], boostPercentage);
-
-    }
-    if (scene.children[i] instanceof Cube2) {
-      Cube2.prototype.changeColor.call(scene.children[i], boostPercentage);
-
-    }
+ for (var cInd = 0; cInd < cubeArr.length; cInd++) {
+      cubeArr[cInd].incrementAndChangeColor(boostPercentage);
   }
 }
 

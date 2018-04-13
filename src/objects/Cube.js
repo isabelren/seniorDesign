@@ -29,26 +29,25 @@ export default class Cube extends Object3D {
     this.curvePath = curvePath;
     this.meshArr = []
     this.visibleMesh = 0;
-    this.building = building;
 
     const mesh = building;
     this.meshArr.push(building.mesh);
 
 
-  	var position = curvePath.curve.getPoint(u);
+    var position = curvePath.curve.getPoint(u);
     var lookAtPoint = curvePath.curve.getPoint((u + .01) % 1);
 
-    this.createOtherBuildings(position, lookAtPoint);
+    //this.createOtherBuildings(position, lookAtPoint);
 
-    //mesh.position.set(position.x, position.y, position.z);
-  	//mesh.lookAt(lookAtPoint);
+    mesh.position.set(position.x, position.y, position.z);
+    mesh.lookAt(lookAtPoint);
 
-  	this.add(mesh)
-	
+    this.add(mesh)
+  
   }
 
   createOtherBuildings(position, lookAtPoint) {
-    var numCopies = 20;
+    var numCopies = 10;
     var dupeMesh = this.meshArr[0].clone();
     var dupeMesh2 = this.meshArr[0].clone();
     var yTransform = .05;
@@ -94,27 +93,17 @@ export default class Cube extends Object3D {
   }
 
   incrementU() {
-  	this.u += 0.001;
-  	if (this.u > this.uMax) {
-  		this.u = 0;
-  	}
-
-    this.meshArr[this.visibleMesh].visible = false;
-    if (this.visibleMesh == this.meshArr.length - 1) {
-      this.visibleMesh = 1;
-    } else {
-      this.visibleMesh += 1;
+    this.u += 0.001;
+    if (this.u > this.uMax) {
+      this.u = 0;
     }
-    
+    var mesh = this.children[0]
 
-  	var mesh = this.meshArr[this.visibleMesh]
-    mesh.visible = true;
+    var newPosition = this.curvePath.curve.getPoint(this.u);
+    mesh.position.set(newPosition.x, newPosition.y, newPosition.z);
 
-  	var newPosition = this.curvePath.curve.getPoint(this.u);
-  	mesh.position.set(newPosition.x, newPosition.y, newPosition.z);
-
-  	var lookAtPoint = this.curvePath.curve.getPoint((this.u + .01) % 1);
-    mesh.lookAt(lookAtPoint.x, lookAtPoint.y + (this.building.totalHeight / 2), lookAtPoint.z);
+    var lookAtPoint = this.curvePath.curve.getPoint((this.u + .01) % 1);
+    mesh.lookAt(lookAtPoint);
   }
 
   changeColor(boost) {
@@ -122,4 +111,4 @@ export default class Cube extends Object3D {
   }
 }
 
-	
+  

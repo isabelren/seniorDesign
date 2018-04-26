@@ -34,6 +34,8 @@ export default class CubicBezierSurface extends Object3D {
 
     const material = new MeshLambertMaterial({color: 0x23262D, side: DoubleSide})
     const mesh = new Mesh(shape3d, material);
+
+
     mesh.translateZ(-width / 2);
 
 

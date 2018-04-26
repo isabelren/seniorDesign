@@ -10,6 +10,7 @@ import Building from './objects/Building'
 import Room from './objects/Room'
 import Torus from './objects/Torus'
 import Icosahedron from './objects/Icosahedron'
+import WireframeIcosahedron from './objects/WireframeIcosahedron'
 import { BSPBuilding, RoomMerge, FloorMerge } from './objects/BSPBuilding'
 import OrbitControls from './controls/OrbitControls'
 import { gui } from './utils/debug'
@@ -25,10 +26,22 @@ const THREE = require('three');
 var uMax = .95;
 var numCubes = 15;
 var boost = 0;
+var prevBoost = 0;
+
+// Array of buildings for easy access
 var cubeArr = [];
+
+//Color Values
 var rVal = 249
 var gVal = 228
 var bVal = 255
+
+var iso;
+var wireIso;
+var wireIso2;
+var wireIsoScale = 1;
+
+
 
 /* Custom settings */
 const SETTINGS = {
@@ -40,7 +53,7 @@ const container = document.body
 const renderer = new WebGLRenderer({antialias: true})
 //renderer.setClearColor(0xf9e4ff)
 var cColor = new THREE.Color(rVal/255,gVal/255,bVal/255)
-renderer.setClearColor(cColor)
+renderer.setClearColor(0x000000)
 
 container.style.overflow = 'hidden'
 container.style.margin = 0
@@ -69,23 +82,33 @@ const frontLight = new PointLight(0xFFFFFF, 2, 100)
 const backLight = new PointLight(0xFFFFFF, 2, 100)
 const lowLight =  new PointLight(0xFFFFFF, 1, 100)
 const lowLight2 =  new PointLight(0xFFFFFF, 2, 100)
-const icosLight =  new PointLight(0xFFFFFF, 2, 100)
-var light = new THREE.AmbientLight( 0x818181 ); // soft white light
-//scene.add( light );
+const icosLight =  new PointLight(0xFFFFFF, 1, 100)
+
+
+var light = new THREE.AmbientLight( 0x292929 ); // soft white light
+scene.add( light );
 
 var directionalLight = new THREE.DirectionalLight( 0xffffff, 1 );
 scene.add( directionalLight );
 directionalLight.position.set(55, 60, 0)
 var targetObject = new THREE.Object3D();
-  scene.add(targetObject);
-
+scene.add(targetObject);
 targetObject.position.set(50,80,10)
 directionalLight.target = targetObject;
-/*scene.add(frontLight);
-scene.add(backLight)
-scene.add(lowLight)
-scene.add(lowLight2)
-*/
+
+
+scene.add(frontLight);
+//scene.add(backLight)
+//scene.add(lowLight)
+//scene.add(lowLight2)
+scene.add(icosLight)
+
+icosLight.position.set(-80, 120, -5)
+frontLight.position.set(30, 80, -25)
+backLight.position.set(-30, 80, 25)
+lowLight.position.set(60, 50, 0)
+lowLight2.position.set(55, 30, 0)
+
 
 var t = new Torus();
 scene.add(t)
@@ -94,15 +117,20 @@ var t = new Torus();
 scene.add(t)
 t.position.set(50, 65, 0);
 
-var t = new Icosahedron(6, 0);
-scene.add(t)
-t.position.set(-100, 90, 0);
+iso = new Icosahedron(6, 0);
+scene.add(iso)
+iso.position.set(-100, 90, 0);
 
 
-frontLight.position.set(30, 80, -25)
-backLight.position.set(-30, 80, 25)
-lowLight.position.set(60, 50, 0)
-lowLight2.position.set(55, 30, 0)
+wireIso = new WireframeIcosahedron(8, 0);
+scene.add(wireIso)
+
+wireIso2 = new WireframeIcosahedron(10, 0);
+scene.add(wireIso2)
+
+wireIso.position.set(-100, 90, 0);
+wireIso2.position.set(-100, 90, 0);
+wireIso2.rotateOnAxis(new Vector3(0, 1, 0), 1.5);
 
 
 
@@ -166,9 +194,15 @@ function onResize () {
 function render (dt) {
   controls.update()
 
+  iso.rotateOnAxis(new Vector3(0,1,0), 0.05)
+
   if (boost != 0) {
     var boostPercentage = ((100 - (boost * .8)) / 110) * 4
     loopAndUpdateColor(scene, boostPercentage);
+    var scale1 = wireIsoScale * 1 + (boostPercentage * .4);
+    var scale2 = wireIsoScale * 1 + (boostPercentage * .05);
+    wireIso.scale.set(scale1, scale1, scale1)
+    wireIso2.scale.set(scale2, scale2, scale2)
   } else {
     loopAndUpdatePositions(scene);
   }
@@ -201,8 +235,8 @@ function loopAndUpdateColor(scene, boostPercentage) {
 function addObjectsToScene(scene, lsys) {
   var surface = new ExtrudedSurface();
 
-  var cubePathL = new CubePath(-8);
-  var cubePathR = new CubePath(8);
+  var cubePathL = new CubePath(-9);
+  var cubePathR = new CubePath(9);
 
   // Uncomment to add paths to scene
   //scene.add(cubePathR);

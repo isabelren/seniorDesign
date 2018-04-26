@@ -15,15 +15,8 @@ export default class Room extends THREE.Object3D {
 
 		var geometry = new THREE.ExtrudeGeometry( squareShape, extrudeSettings );
 
-		const material = new THREE.MeshLambertMaterial({color: 0xffffff, side: THREE.DoubleSide})
+		const material = new THREE.MeshLambertMaterial({color: 0xffcccc, side: THREE.DoubleSide})
 		var mesh = new THREE.Mesh( geometry );
-
-
-		// wireframe
-		var geo = new THREE.EdgesGeometry( mesh.geometry ); // or WireframeGeometry
-		var mat = new THREE.LineBasicMaterial( { color: 0xffffff, linewidth: 2 } );
-		var wireframe = new THREE.LineSegments( geo, mat );
-		mesh.add( wireframe );
 
 		mesh.rotation.set(Math.PI / 2, 0, 0);
     	mesh.position.set(xTrans, 0, yTrans);

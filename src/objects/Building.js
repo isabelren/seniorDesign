@@ -24,7 +24,7 @@ export default class Building extends THREE.Object3D {
 	AutoGenerateFloorHeights() {
 
 	    var lowerHeightBound = 1;
-	    var upperHeightBound = 5;
+	    var upperHeightBound = 4;
 	    var maxNumFloors = 11;
 	    
 

@@ -52,9 +52,7 @@ export function RoomMerge(mesh1, mesh2) {
 	const bsp2 = new ThreeBSP(mesh2);
 	const bsp3 = bsp1.union(bsp2);
 	const newMesh = bsp3.toMesh();
-	const material = new THREE.MeshLambertMaterial({color: 0xfffff, side: THREE.DoubleSide})
 
-	newMesh.material = material;
 	return newMesh;
 }
 

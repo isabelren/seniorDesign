@@ -1,11 +1,10 @@
 import { Object3D, CurvePath, CubicBezierCurve3, BufferGeometry, Line, LineBasicMaterial, MeshLambertMaterial, Mesh, Vector3, Matrix4 } from 'three'
 
 
-var surfaceScale = 50;
+var surfaceScale = 70;
 var zAxis = new Vector3(0,0,1);
 var angle = -Math.PI / 4;
 var controlPt = .352284749831;
-
 
 export default class CubePath extends Object3D {
   constructor (z) {
@@ -30,7 +29,6 @@ export default class CubePath extends Object3D {
     var material = new LineBasicMaterial( { color : 0xff0000 } );
     const mesh = new Line(geometry, material)
     this.curve = curve;
-    this.translateY(0.5);
 
     this.add(mesh);
   }

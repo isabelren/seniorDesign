@@ -137,7 +137,20 @@ function replaceNode(linkedList, node, replacementString) {
 
 export default function Lsystem(axiom, grammar, iterations) {
 	// default LSystem
-	this.axiom = "FMMML";
+	var lowerFloorBound = 2
+	var upperFloorBound = 5
+
+	//generate number of floors
+	var numMFloors = Math.floor((Math.random() * upperFloorBound) + lowerFloorBound);
+	var axiom = "F";
+
+	for (var i = 0; i < numMFloors; i++) {
+		axiom = axiom.concat("M");
+	}
+	axiom = axiom.concat("L?")
+
+	this.axiom = axiom;
+	console.log(axiom)
 	this.grammar = {};
 
 	//f for first floor, rules for single room or multiroom
@@ -145,6 +158,11 @@ export default function Lsystem(axiom, grammar, iterations) {
 	this.grammar['F'] = [
 		new Rule(0.6, 'R'),
 		new Rule(0.4, 'A')
+	]
+
+	this.grammar['?'] = [ //is there an antennae?
+		new Rule(0.8, ''),
+		new Rule(0.2, '!')
 	]
 
 	this.grammar['M'] = [
@@ -157,12 +175,13 @@ export default function Lsystem(axiom, grammar, iterations) {
 		new Rule(0.2, 'SSA')
 	]
 
-	//Multi room, A adds another room
+	//Multi room, A adds another room to the floor (does not start new floor)
 	this.grammar['A'] = [
 		new Rule(0.6, 'CCA'),
 		new Rule(0.3, 'CCCA'),
 		new Rule(0.1, 'CCCCA')
 	]
+
 
 	this.grammar['R'] = [
 		new Rule(0.6, 'CCR'),
@@ -182,10 +201,10 @@ export default function Lsystem(axiom, grammar, iterations) {
 		new Rule(0.25, 'y'),
 	]
 	this.grammar['S'] = [
-		new Rule(0.05, 'u'),
-		new Rule(0.45, 'U'),
-		new Rule(0.05, 'v'),
-		new Rule(0.45, 'V'),
+		new Rule(0.45, 'u'), // Decrease x length
+		new Rule(0.05, 'U'),
+		new Rule(0.45, 'v'), // decrease y length
+		new Rule(0.05, 'V'),
 	]
 
 	//m for middle floor

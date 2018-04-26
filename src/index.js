@@ -9,6 +9,7 @@ import Floor from './objects/Floor'
 import Building from './objects/Building'
 import Room from './objects/Room'
 import Torus from './objects/Torus'
+import Icosahedron from './objects/Icosahedron'
 import { BSPBuilding, RoomMerge, FloorMerge } from './objects/BSPBuilding'
 import OrbitControls from './controls/OrbitControls'
 import { gui } from './utils/debug'
@@ -18,11 +19,16 @@ import CubePath from './objects/CubePath'
 import Lsystem, {LinkedListToString} from './LSystem'
 import Turtle from './turtle'
 
+const THREE = require('three');
 
-var uMax = .85;
-var numCubes = 10;
+
+var uMax = .95;
+var numCubes = 15;
 var boost = 0;
 var cubeArr = [];
+var rVal = 249
+var gVal = 228
+var bVal = 255
 
 /* Custom settings */
 const SETTINGS = {
@@ -32,7 +38,10 @@ const SETTINGS = {
 /* Init renderer and canvas */
 const container = document.body
 const renderer = new WebGLRenderer({antialias: true})
-renderer.setClearColor(0xD7E4FF)
+//renderer.setClearColor(0xf9e4ff)
+var cColor = new THREE.Color(rVal/255,gVal/255,bVal/255)
+renderer.setClearColor(cColor)
+
 container.style.overflow = 'hidden'
 container.style.margin = 0
 container.appendChild(renderer.domElement)
@@ -47,34 +56,69 @@ const scene = new Scene()
 const camera = new PerspectiveCamera(50, resize.width / resize.height, 0.1, 1000)
 
 const controls = new OrbitControls(camera, {element: renderer.domElement, parent: renderer.domElement, 
-  distance: 40, 
-  phi: 1.52, 
+  distance: 64, 
+  phi: 1.479,
   theta: Math.PI / 2,
-  target: new Vector3(-15,43,0)})
+  /*distance: 40,
+  phi: 1.1, 
+  theta: 2,*/
+  target: new Vector3(-15,60,0)})
 
 /* Lights */
-const frontLight = new PointLight(0xFFFFFF, 3, 100)
-const backLight = new PointLight(0xFFFFFF, 3, 100)
+const frontLight = new PointLight(0xFFFFFF, 2, 100)
+const backLight = new PointLight(0xFFFFFF, 2, 100)
 const lowLight =  new PointLight(0xFFFFFF, 1, 100)
+const lowLight2 =  new PointLight(0xFFFFFF, 2, 100)
+const icosLight =  new PointLight(0xFFFFFF, 2, 100)
+var light = new THREE.AmbientLight( 0x818181 ); // soft white light
+//scene.add( light );
 
+var directionalLight = new THREE.DirectionalLight( 0xffffff, 1 );
+scene.add( directionalLight );
+directionalLight.position.set(55, 60, 0)
+var targetObject = new THREE.Object3D();
+  scene.add(targetObject);
 
-scene.add(frontLight);
+targetObject.position.set(50,80,10)
+directionalLight.target = targetObject;
+/*scene.add(frontLight);
 scene.add(backLight)
 scene.add(lowLight)
-
+scene.add(lowLight2)
+*/
 
 var t = new Torus();
 scene.add(t)
-t.position.set(55, 50, 0);
+t.position.set(55, 60, 0);
+var t = new Torus();
+scene.add(t)
+t.position.set(50, 65, 0);
 
-frontLight.position.set(30, 70, -25)
-backLight.position.set(-30, 70, 25)
-lowLight.position.set(60, 40, 0)
+var t = new Icosahedron(6, 0);
+scene.add(t)
+t.position.set(-100, 90, 0);
+
+
+frontLight.position.set(30, 80, -25)
+backLight.position.set(-30, 80, 25)
+lowLight.position.set(60, 50, 0)
+lowLight2.position.set(55, 30, 0)
 
 
 
 var lsys = new Lsystem();
 var turtle = new Turtle();
+
+/*var building1 = doLsystem(lsys, 6, turtle);
+building1.mesh.position.set(-15,60,0)
+scene.add(building1)
+
+var building2 = doLsystem(lsys, 6, turtle);
+building2.mesh.position.set(-15,60,10)
+scene.add(building2)
+var building3 = doLsystem(lsys, 6, turtle);
+building3.mesh.position.set(-15,60,-10)
+scene.add(building3)*/
 
 /* Actual content of the scene */
 addObjectsToScene(scene, lsys);
@@ -257,11 +301,19 @@ function playSound(buffer) {
 
   //Copy data into unsigned byte array to scale the cubes
   sourceJs.onaudioprocess = function(e) {
-    array = new Uint8Array(analyser.frequencyBinCount);
-    analyser.getByteFrequencyData(array);
+    
+    /*array = new Float32Array(analyser.fftSize
+    analyser.getFloatTimeDomainData(array);*/
+    
+    /*array = new Uint8Array(analyser.frequencyBinCount);
+    analyser.getByteFrequencyData(array);*/
+
+
+    array = new Uint8Array(analyser.fftSize); // Uint8Array should be the same length as the fftSize 
+    analyser.getByteTimeDomainData(array)
     boost = 0;
     for (var i = 0; i < array.length; i++) {
-        boost += array[i];
+        boost += array[i] * .5;
     }
     boost = boost / array.length;
 

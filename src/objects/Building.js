@@ -22,22 +22,21 @@ export default class Building extends THREE.Object3D {
 
 	//TODO: can store heights in turtle?
 	AutoGenerateFloorHeights() {
-		var lowerFloorBound = 3
-	    var upperFloorBound = 8
 
 	    var lowerHeightBound = 1;
-	    var upperHeightBound = 8;
-
-	    //generate number of floors
-	    var numFloors = Math.floor((Math.random() * upperFloorBound) + lowerFloorBound);
+	    var upperHeightBound = 5;
+	    var maxNumFloors = 11;
+	    
 
 	    //generate height of each floor in an array
 	    var floorHeights = [];
 	    var totalHeight = 0;
-	    for (var i = 0; i < numFloors; i++) {
+	    for (var i = 0; i < maxNumFloors; i++) {
 	      var newHeight = lowerHeightBound + Math.floor((Math.random() * upperHeightBound));
-	      floorHeights.push(newHeight);
 	      totalHeight += newHeight;
+	      floorHeights.push(totalHeight);
+	      
+	     
 	    }
 	    this.floorHeights = floorHeights;
 	    this.totalHeight = totalHeight;
@@ -68,9 +67,23 @@ export default class Building extends THREE.Object3D {
 			}
 			currentMesh.rotation.set(-Math.PI / 2, 0, 0);
 			currentMesh.position.set(0,0,0);
-			const material = new THREE.MeshLambertMaterial({color: 0xffcccc, side: THREE.DoubleSide})
-      		//const material = new THREE.MeshStandardMaterial({color: 0xA197C9, roughness: 0.18, metalness: 0.5})
+			const material = new THREE.MeshLambertMaterial({
+				color: 0x6c74ea, 
+				side: THREE.DoubleSide,
+				polygonOffset: true,
+			    polygonOffsetFactor: 1, // positive value pushes polygon further away
+			    polygonOffsetUnits: 1
+			})
+
       		currentMesh.material = material;
+
+      		// wireframe
+			var geo = new THREE.EdgesGeometry( currentMesh.geometry ); // or WireframeGeometry
+			var mat = new THREE.LineBasicMaterial( { color: 0xffffff, linewidth: 2 } );
+			this.wiremat = mat
+			var wireframe = new THREE.LineSegments( geo, mat );
+			currentMesh.add( wireframe );
+
 
 			this.RemoveAndReplaceMesh(currentMesh)
 		}
@@ -81,10 +94,10 @@ export default class Building extends THREE.Object3D {
 	}
 
 
-	CreateRoom (height, xTrans, yTrans, heightTrans, scale=1, minHeight = 0, maxHeight = 4, minLength = 0) {
-		var xLength = minLength + Math.floor((Math.random() * 4 * scale) + 1);
-  		var yLength = minLength + Math.floor((Math.random() * 4 * scale) + 1);
-  		this.currentRooms.push(new Room(height, xLength, yLength, 1, xTrans, yTrans, heightTrans));
+	CreateRoom (height, xTrans, yTrans, maxLength = 4, minLength = 1, scale=1 ) {
+		var xLength = minLength + (Math.random() * maxLength * scale);
+  		var yLength = minLength + (Math.random() * maxLength * scale);
+  		this.currentRooms.push(new Room(height, xLength, yLength, 1, xTrans, yTrans));
 
 	}
 }

@@ -1,6 +1,8 @@
 
 const THREE = require('three')
 import Building from './objects/Building'
+
+var maxBottomRoomLength = 5;
   
 export default class Turtle {
     
@@ -12,14 +14,16 @@ export default class Turtle {
         this.yLength = 2;
         this.deltaTrans = 0.25;
         this.deltaLength = 0.25;
-        this.currentRoomNum = 0;
+        this.currentFloorNum = 0;
+        this.prevIncremented = false;
 
         // Make sure to implement the functions for the new rules inside Turtle
         if (typeof grammar === "undefined") {
             this.renderGrammar = {
                 // create room with current class variables
-                'R' : this.CreateBuildingRoom.bind(this),
+                'R' : this.CreateBuildingRoom.bind(this), //Goes to next floor
                 'A' : this.CreateFloorBuildingRoom.bind(this),
+                '!' : this.CreateAntennae.bind(this),
                 
                 'x' : this.DecreaseXTrans.bind(this),
                 'X' : this.IncreaseXTrans.bind(this),
@@ -38,34 +42,59 @@ export default class Turtle {
     }
 
     CreateBuildingRoom() {
-        if (this.currentRoomNum < this.building.floorHeights.length) {
-            var currentFloorHeight = this.building.floorHeights[this.currentRoomNum];
+        if (this.currentFloorNum < this.building.floorHeights.length) {
+            var currentFloorHeight = this.building.floorHeights[this.currentFloorNum];
+
+            var maxRoomLength = (this.building.floorHeights.length - this.currentFloorNum)/this.building.floorHeights.length * maxBottomRoomLength;
             this.building.CreateRoom(currentFloorHeight,
             this.xTrans,
             this.yTrans,
-            this.building.totalHeight - currentFloorHeight);
-            this.currentRoomNum += 1;
+            maxRoomLength);
+            
+            this.currentFloorNum += 1;
+            this.prevIncremented = true;
         } else {
-            console.log("currentRoomNum is larger than number of floors!")
+            console.log("currentFloorNum is larger than number of floors!")
         }
 
     }
 
     CreateFloorBuildingRoom() {
-        if (this.currentRoomNum < this.building.floorHeights.length) {
-            var currentFloorHeight = this.building.floorHeights[this.currentRoomNum];
-            this.building.CreateRoom(currentFloorHeight,
-            this.xTrans,
-            this.yTrans,
-            this.building.totalHeight - currentFloorHeight);
+        if (this.currentFloorNum < this.building.floorHeights.length) {
+            var currentFloorHeight = this.building.floorHeights[this.currentFloorNum];
+            var maxRoomLength = (this.building.floorHeights.length - this.currentFloorNum)/this.building.floorHeights.length * maxBottomRoomLength;
+
+            this.building.CreateRoom(
+                currentFloorHeight,
+                this.xTrans,
+                this.yTrans,
+                maxRoomLength);
+
+            this.prevIncremented = false;
         } else {
-            console.log("currentRoomNum is larger than number of floors!")
+            console.log("currentFloorNum is larger than number of floors!")
         }
 
     }
 
+    CreateAntennae() {
+        if (this.prevIncremented) {
+            this.currentFloorNum--;
+        }
+        var currentHeight = this.building.floorHeights[this.currentFloorNum];
+
+        var antHeight = currentHeight + 1 + (Math.random() * currentHeight/3 );
+        this.building.CreateRoom(
+                antHeight,
+                this.xTrans,
+                this.yTrans,
+                0.14, 
+                0.08);
+
+    }
+
     NextFloor() {
-        this.currentRoomNum += 1;
+        this.currentFloorNum += 1;
     }
 
     DecreaseXTrans() {
@@ -104,7 +133,7 @@ export default class Turtle {
     getAndResetBuilding() {
         var currentBuilding = this.building;
         this.building = new Building();
-        this.currentRoomNum = 0;
+        this.currentFloorNum = 0;
         return currentBuilding;
 
     }

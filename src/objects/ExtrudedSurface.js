@@ -2,7 +2,7 @@
 import { DoubleSide, Object3D, Vector2, Vector3, Matrix4, Mesh, LineCurve, Shape, ExtrudeGeometry, MeshLambertMaterial } from 'three'
 import Cube from './Cube'
 
-var surfaceScale = 50;
+var surfaceScale = 70;
 var width = 70;
 var controlPt = .352284749831;
 
@@ -14,6 +14,7 @@ var startPoint = (new Vector3(-surfaceScale, 0, 0)).applyAxisAngle(zAxis, angle)
 var controlPoint1 = (new Vector3(-surfaceScale, controlPt * surfaceScale, 0)).applyAxisAngle(zAxis, angle);
 var controlPoint2 = (new Vector3( -controlPt * surfaceScale, surfaceScale, 0)).applyAxisAngle(zAxis, angle);
 var endPoint = (new Vector3(0, surfaceScale, 0)).applyAxisAngle(zAxis, angle);
+
 
 var extrudeSettings = {
 	curveSegments: 100,

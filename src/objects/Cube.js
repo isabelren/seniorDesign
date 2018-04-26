@@ -27,6 +27,7 @@ export default class Cube extends Object3D {
     this.u = u;
     this.uMax = uMax;
     this.curvePath = curvePath;
+    this.building = building;
 
     const mesh = building;
 
@@ -51,6 +52,7 @@ export default class Cube extends Object3D {
     mesh.position.set(newPosition.x, newPosition.y, newPosition.z);
 
     var lookAtPoint = this.curvePath.curve.getPoint((this.u + .01) % 1);
+
     mesh.lookAt(lookAtPoint);
   }
 
@@ -61,19 +63,16 @@ export default class Cube extends Object3D {
     }
     var mesh = this.children[0]
 
-    mesh.mesh.material.color.setRGB(boost, 0.4 * boost, .70 * boost);
+    //mesh.mesh.material.color.setRGB(boost, 0.4 * boost, .70 * boost);
+
+    this.building.wiremat.color.setRGB(boost, 0.4 * boost, .70 * boost);
+    // = new THREE.Color( 0xff0000 );
 
     var newPosition = this.curvePath.curve.getPoint(this.u);
     mesh.position.set(newPosition.x, newPosition.y, newPosition.z);
 
     var lookAtPoint = this.curvePath.curve.getPoint((this.u + .01) % 1);
     mesh.lookAt(lookAtPoint);
-  }
-
-
-  changeColor(boost) {
-    console.log(this.children[0].mesh)
-    
   }
 
 

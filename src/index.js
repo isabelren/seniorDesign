@@ -128,7 +128,7 @@ var campDeRoses = [
 0xf1bbbb,
 0xe6d8cb
 ]
-pastelColors = candyAlmondRainbow
+pastelColors = campDeRoses
 
 
 

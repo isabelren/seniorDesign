@@ -32,7 +32,7 @@ export default class CubicBezierSurface extends Object3D {
 
     var shape3d = new ExtrudeGeometry(path, extrudeSettings);
 
-    const material = new MeshLambertMaterial({color: 0x8fcbd4/*0x8ed3f4*/, side: DoubleSide})
+    const material = new MeshLambertMaterial({color: 0x4c6d7a/*0x8ed3f4*/, side: DoubleSide})
     const mesh = new Mesh(shape3d, material);
 
 

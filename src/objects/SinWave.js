@@ -26,6 +26,7 @@ export default class SinWave extends Object3D {
 
     // Create the final object to add to the scene
     var splineObject = new THREE.Line( geometry, material );
+    geometry.position.setX
     this.curve = curve;
     this.add(splineObject)
   }

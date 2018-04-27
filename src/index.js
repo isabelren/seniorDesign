@@ -23,11 +23,17 @@ import SinWave from './objects/SinWave'
 import Lsystem, {LinkedListToString} from './LSystem'
 import Turtle from './turtle'
 
+//to change upper height bound (for each floor generated, edit the first input to turtle)
+//to change number of intermediate floors, go to autogenerateFloorHeights and change maxnumfloors
+
 const THREE = require('three');
 
+var lowHighIsoColor =0xa2adff;
+var isoColor = 0x3b52ff;
+var wireColor = 0xa2adff;
 
 var uMax = .95;
-var numCubes = 15;
+var numCubes = 19;
 var boost = 0;
 var lowBoost = 0;
 var highBoost = 0;
@@ -36,6 +42,8 @@ var sphere;
 
 // Array of buildings for easy access
 var cubeArr = [];
+
+var cubeArr2 = []
 
 //Color Values
 var rVal = 249
@@ -129,23 +137,23 @@ lowLight2.position.set(55, 30, 0)
 
 
 var t = new Torus();
-scene.add(t)
+//scene.add(t)
 t.position.set(55, 60, 0);
-var t = new Torus();
+t = new Torus();
 scene.add(t)
-t.position.set(50, 65, 0);
+//t.position.set(50, 65, 0);
 
 
 
-iso = new Icosahedron(6, 0, 0xb1e5ff);
+iso = new Icosahedron(6, 0);
 scene.add(iso)
 iso.position.set(-100, 90, 0);
 
-var lowiso = new Icosahedron(2, 0, 0xFAB1FF);
+var lowiso = new Icosahedron(2, 0);
 scene.add(lowiso)
 lowiso.position.set(-100, 70, 0);
 
-var highiso = new Icosahedron(2, 0, 0xFAB1FF);
+var highiso = new Icosahedron(2, 0);
 scene.add(highiso)
 highiso.position.set(-100, 110, 0);
 
@@ -164,6 +172,7 @@ wireIso2.rotateOnAxis(new Vector3(0, 1, 0), 1.5);
 
 var lsys = new Lsystem();
 var turtle = new Turtle();
+var turtle2 = new Turtle(6);
 
 /*var building1 = doLsystem(lsys, 6, turtle);
 building1.mesh.position.set(-15,60,0)
@@ -185,11 +194,11 @@ addObjectsToScene(scene, lsys);
 //rules for room size
 //rules for kinds of rooms
 
-function doLsystem(lsystem, iterations, turtle) {
+function doLsystem(lsystem, iterations, thisturtle) {
     var result = lsystem.doIterations(iterations);
     console.log(LinkedListToString(result))
-    turtle.renderSymbols(result);
-    var building = turtle.getAndResetBuilding()
+    thisturtle.renderSymbols(result);
+    var building = thisturtle.getAndResetBuilding()
     building.CreateBuildingFromRooms(chooseColor());
     return building;
 }
@@ -249,6 +258,7 @@ function render (dt) {
 function loopAndUpdatePositions(scene) {
   for (var cInd = 0; cInd < cubeArr.length; cInd++) {
       cubeArr[cInd].incrementU();
+      cubeArr2[cInd].incrementU();
       //sphere.incrementU();
   }
 }
@@ -259,6 +269,9 @@ function loopAndUpdateColor(scene, boostPercentage, low, high) {
       var g = 0.5 * boostPercentage
       var b = boostPercentage
       cubeArr[cInd].incrementAndChangeColor(boostPercentage, r, g, b);
+
+      cubeArr2[cInd].incrementAndChangeColor(boostPercentage, 1, .7, 1);
+      //cubeArr2[cInd].incrementAndChangeColor(low * .8, b, g, r);
       
       //sphere.incrementU();
 
@@ -274,16 +287,23 @@ function loopAndUpdateColor(scene, boostPercentage, low, high) {
       wireIso2.scale.set(scale2, scale2, scale2)
 
       var col = {r: boostPercentage, g: boostPercentage, b: boostPercentage};
-      wireIso.material.color.setRGB(r * 1.3, g, b)
-      wireIso2.material.color.setRGB(r * .7 * 1.3, g * .7, b * .7)
+      wireIso.material.color.set(wireColor)
+      wireIso2.material.color.set(wireColor)
+      lowiso.material.color.set(lowHighIsoColor)
+      highiso.material.color.set(lowHighIsoColor)
+      iso.material.color.set(isoColor)
+
   }
 }
 
 function addObjectsToScene(scene, lsys) {
   var surface = new ExtrudedSurface();
 
-  var cubePathL = new CubePath(-10);
-  var cubePathR = new CubePath(10);
+  var cubePathL = new CubePath(-8);
+  var cubePathR = new CubePath(8);
+
+  var cubePathL2 = new CubePath(-15);
+  var cubePathR2 = new CubePath(15);
 
   // Uncomment to add sphere and sin path
   /*var sinPath = new SinWave(30, 61);
@@ -313,6 +333,21 @@ function addObjectsToScene(scene, lsys) {
 
       cubeArr.push(cubeL);
       cubeArr.push(cubeR);
+
+
+      var building3 = doLsystem(lsys, 6, turtle2);
+      var building4 = doLsystem(lsys, 6, turtle2);
+
+      var lHeight2 = generateHeight();
+      var cubeL2 = new Cube(lHeight2, cubePathL2, u, uMax, building3);
+      scene.add(cubeL2)
+
+      var rHeight2 = generateHeight();
+      var cubeR2 = new Cube(rHeight2, cubePathR2, u, uMax, building4);
+      scene.add(cubeR2)
+
+      cubeArr2.push(cubeL2);
+      cubeArr2.push(cubeR2);
       
       
     } else {

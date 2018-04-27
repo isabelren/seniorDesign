@@ -66,6 +66,7 @@ export default class Cube extends Object3D {
     //   mesh.mesh.material.color.setRGB(boost, 0.4 * boost, .70 * boost);
 
     this.building.wiremat.color.setRGB( r, g, b);
+
     // = new THREE.Color( 0xff0000 );
 
     var newPosition = this.curvePath.curve.getPoint(this.u);

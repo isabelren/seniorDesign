@@ -7,10 +7,11 @@ import Floor from './Floor'
 
 //to create a floor: call CreateRoom with parameters and then call createFloor()
 export default class Building extends THREE.Object3D {
-  	constructor (floorHeights=[], totalHeight=0) {
+  	constructor (upperHeightBound=2, floorHeights=[], totalHeight=0 ) {
 		super()
 		this.floorHeights = floorHeights;
 		this.totalHeight = totalHeight;
+		this.upperHeightBound=upperHeightBound
 
 		if (floorHeights.length == 0) {
 			this.AutoGenerateFloorHeights();
@@ -24,15 +25,13 @@ export default class Building extends THREE.Object3D {
 	AutoGenerateFloorHeights() {
 
 	    var lowerHeightBound = 1;
-	    var upperHeightBound = 3;
 	    var maxNumFloors = 11;
-	    
 
 	    //generate height of each floor in an array
 	    var floorHeights = [];
 	    var totalHeight = 0;
 	    for (var i = 0; i < maxNumFloors; i++) {
-	      var newHeight = lowerHeightBound + Math.floor((Math.random() * upperHeightBound));
+	      var newHeight = lowerHeightBound + Math.floor((Math.random() * this.upperHeightBound));
 	      totalHeight += newHeight;
 	      floorHeights.push(totalHeight);
 	      

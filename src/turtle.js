@@ -6,8 +6,9 @@ var maxBottomRoomLength = 5;
   
 export default class Turtle {
     
-    constructor(grammar) {
-        this.building = new Building();
+    constructor(upperHeightBound=3, grammar) {
+        this.upperHeightBound=upperHeightBound;
+        this.building = new Building(upperHeightBound);
         this.xTrans = 0;
         this.yTrans = 0;
         this.xLength = 2;
@@ -132,7 +133,7 @@ export default class Turtle {
 
     getAndResetBuilding() {
         var currentBuilding = this.building;
-        this.building = new Building();
+        this.building = new Building(this.upperHeightBound);
         this.currentFloorNum = 0;
         return currentBuilding;
 

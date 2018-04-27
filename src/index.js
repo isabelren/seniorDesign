@@ -55,10 +55,81 @@ var wfGreen = 33/255
 var wfBlue = 42/255
 
 var pastelColors = []
-pastelColors.push(0xdbb1ea) //purple
-pastelColors.push(0xFAB1FF) //pink
+/*pastelColors.push(0xdbb1ea) //purple
+pastelColors.push(0xFFC0CB) //pink
 pastelColors.push(0xb4b1ff) //violet
 pastelColors.push(0xb1e5ff) //blue
+pastelColors.push(0xffa58e) //salmon
+pastelColors.push(0xffc47b) //orange
+pastelColors.push(0xffef90) //yellow*/
+
+var melonSurprise = [0xD1F2A5, //green
+0xEFFAB4, //lime green
+0xFFC48C, // orange sherbert
+0xFF9F80, //salmon oragne
+0xF56991] // watermelon
+
+var vuittonsBreakfast = [
+0x805841, //pleather
+0xDCF7F3, //light blue
+0XFFFCDD,  //light yellow
+0XFFD8D8,  //light pink
+0XF5A2A2]  //darker pink
+
+var weCanGoToHeaven = [
+0xF3E7D7, //beige
+0xF7D7CD, //muted orange
+0xF8C8C9, //pink
+0xE0C0C7, //mauve
+0xC7B9C5 //muted purple
+]
+
+var marysLove = [
+0x73a8af, //turqoise
+0xb2b6ab, //muted green
+0xdcbdb1, //muted tan
+0xf6bcad, //salmon
+0xf2dfca, //light tan
+]
+
+var dreamsBring = [
+0xf8dafb,
+0xe8dafb,
+0xdaddfb,
+0xdaedfb,
+0xdafbf8
+]
+
+var pastelRainbow = [
+0xffabab,
+0xffdaab,
+0xddffab,
+0xabe4ff,
+0xd9abff,
+]
+
+var candyAlmondRainbow = [
+0xf8f087,
+0xb7e3c0,
+0xb8d0dd,
+0xdbbae5,
+0xf39dd4,
+0xffabab,
+0xffdaab,
+0xddffab,
+0xabe4ff,
+0xd9abff,
+]
+
+var campDeRoses = [
+0x2f3559,
+0x9a5071,
+0xe394a7,
+0xf1bbbb,
+0xe6d8cb
+]
+pastelColors = candyAlmondRainbow
+
 
 
 
@@ -79,7 +150,8 @@ const container = document.body
 const renderer = new WebGLRenderer({antialias: true})
 //renderer.setClearColor(0xf9e4ff)
 var cColor = new THREE.Color(rVal/255,gVal/255,bVal/255)
-renderer.setClearColor(0x000000)
+//renderer.setClearColor(0xf4e8d9)
+renderer.setClearColor(0xf4e8d9)
 
 container.style.overflow = 'hidden'
 container.style.margin = 0
@@ -104,18 +176,18 @@ const controls = new OrbitControls(camera, {element: renderer.domElement, parent
   target: new Vector3(-15,60,0)})
 
 /* Lights */
-const frontLight = new PointLight(0xFFFFFF, 2, 100)
+const frontLight = new PointLight(0xFFFFFF, 1, 100)
 const backLight = new PointLight(0xFFFFFF, 2, 100)
 const lowLight =  new PointLight(0xFFFFFF, 1, 100)
 const lowLight2 =  new PointLight(0xFFFFFF, 2, 100)
 const icosLight =  new PointLight(0xFFFFFF, 1, 100)
 
 
-var light = new THREE.AmbientLight( 0x292929 ); // soft white light
+var light = new THREE.AmbientLight( 0xf2f2f2 ); // soft white light
 scene.add( light );
 
 var directionalLight = new THREE.DirectionalLight( 0xffffff, 1 );
-scene.add( directionalLight );
+//scene.add( directionalLight );
 directionalLight.position.set(55, 60, 0)
 var targetObject = new THREE.Object3D();
 scene.add(targetObject);
@@ -123,14 +195,14 @@ targetObject.position.set(50,80,10)
 directionalLight.target = targetObject;
 
 
-scene.add(frontLight);
+//scene.add(frontLight);
 //scene.add(backLight)
 //scene.add(lowLight)
 //scene.add(lowLight2)
-scene.add(icosLight)
+//scene.add(icosLight)
 
 icosLight.position.set(-80, 120, -5)
-frontLight.position.set(30, 80, -25)
+frontLight.position.set(30, 120, -25)
 backLight.position.set(-30, 80, 25)
 lowLight.position.set(60, 50, 0)
 lowLight2.position.set(55, 30, 0)
@@ -145,23 +217,23 @@ scene.add(t)
 
 
 
-iso = new Icosahedron(6, 0);
+iso = new Icosahedron(6, 0, chooseColor());
 scene.add(iso)
 iso.position.set(-100, 90, 0);
 
-var lowiso = new Icosahedron(2, 0);
+var lowiso = new Icosahedron(2, 0, chooseColor());
 scene.add(lowiso)
 lowiso.position.set(-100, 70, 0);
 
-var highiso = new Icosahedron(2, 0);
+var highiso = new Icosahedron(2, 0, chooseColor());
 scene.add(highiso)
 highiso.position.set(-100, 110, 0);
 
 
-wireIso = new WireframeIcosahedron(8, 0);
+wireIso = new WireframeIcosahedron(8, 0, chooseColor());
 scene.add(wireIso)
 
-wireIso2 = new WireframeIcosahedron(10, 0);
+wireIso2 = new WireframeIcosahedron(10, 0, chooseColor());
 scene.add(wireIso2)
 
 wireIso.position.set(-100, 90, 0);
@@ -270,7 +342,7 @@ function loopAndUpdateColor(scene, boostPercentage, low, high) {
       var b = boostPercentage
       cubeArr[cInd].incrementAndChangeColor(boostPercentage, r, g, b);
 
-      cubeArr2[cInd].incrementAndChangeColor(boostPercentage, 1, .7, 1);
+      cubeArr2[cInd].incrementU()
       //cubeArr2[cInd].incrementAndChangeColor(low * .8, b, g, r);
       
       //sphere.incrementU();
@@ -286,12 +358,12 @@ function loopAndUpdateColor(scene, boostPercentage, low, high) {
       wireIso.scale.set(scale1, scale1, scale1)
       wireIso2.scale.set(scale2, scale2, scale2)
 
-      var col = {r: boostPercentage, g: boostPercentage, b: boostPercentage};
+      /*var col = {r: boostPercentage, g: boostPercentage, b: boostPercentage};
       wireIso.material.color.set(wireColor)
       wireIso2.material.color.set(wireColor)
       lowiso.material.color.set(lowHighIsoColor)
       highiso.material.color.set(lowHighIsoColor)
-      iso.material.color.set(isoColor)
+      iso.material.color.set(isoColor)*/
 
   }
 }
@@ -363,8 +435,8 @@ function generateHeight() {
 }
 
 function chooseColor() {
-  //return pastelColors[Math.floor((Math.random() * 4))];
-  return 0x000000
+  return pastelColors[Math.floor((Math.random() * pastelColors.length))];
+
 }
 
 

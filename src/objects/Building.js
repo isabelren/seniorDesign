@@ -67,7 +67,7 @@ export default class Building extends THREE.Object3D {
 			currentMesh.rotation.set(-Math.PI / 2, 0, 0);
 			currentMesh.position.set(0,0,0);
 			const material = new THREE.MeshLambertMaterial({
-				//color: 0x6c74ea, 
+				//color: 0xffffff, 
 				color: color, 
 				side: THREE.DoubleSide,
 				polygonOffset: true,

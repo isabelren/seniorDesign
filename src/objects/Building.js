@@ -24,7 +24,7 @@ export default class Building extends THREE.Object3D {
 	AutoGenerateFloorHeights() {
 
 	    var lowerHeightBound = 1;
-	    var upperHeightBound = 4;
+	    var upperHeightBound = 3;
 	    var maxNumFloors = 11;
 	    
 
@@ -56,7 +56,7 @@ export default class Building extends THREE.Object3D {
 		}
 	}
 
-	CreateBuildingFromRooms () {
+	CreateBuildingFromRooms (color) {
 
 		if (this.currentRooms.length > 1) {
 			var currentMesh = this.currentRooms[0].mesh;
@@ -68,7 +68,8 @@ export default class Building extends THREE.Object3D {
 			currentMesh.rotation.set(-Math.PI / 2, 0, 0);
 			currentMesh.position.set(0,0,0);
 			const material = new THREE.MeshLambertMaterial({
-				color: 0x6c74ea, 
+				//color: 0x6c74ea, 
+				color: color, 
 				side: THREE.DoubleSide,
 				polygonOffset: true,
 			    polygonOffsetFactor: 1, // positive value pushes polygon further away

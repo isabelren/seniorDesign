@@ -138,7 +138,7 @@ function replaceNode(linkedList, node, replacementString) {
 export default function Lsystem(axiom, grammar, iterations) {
 	// default LSystem
 	var lowerFloorBound = 2
-	var upperFloorBound = 5
+	var upperFloorBound = 4
 
 	//generate number of floors
 	var numMFloors = Math.floor((Math.random() * upperFloorBound) + lowerFloorBound);

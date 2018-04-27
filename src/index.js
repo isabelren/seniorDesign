@@ -9,6 +9,8 @@ import Floor from './objects/Floor'
 import Building from './objects/Building'
 import Room from './objects/Room'
 import Torus from './objects/Torus'
+import Sphere from './objects/Sphere'
+
 import Icosahedron from './objects/Icosahedron'
 import WireframeIcosahedron from './objects/WireframeIcosahedron'
 import { BSPBuilding, RoomMerge, FloorMerge } from './objects/BSPBuilding'
@@ -17,6 +19,7 @@ import { gui } from './utils/debug'
 import ExtrudedSurface from './objects/ExtrudedSurface'
 import createGraph from './objects/ParametricSurface'
 import CubePath from './objects/CubePath'
+import SinWave from './objects/SinWave'
 import Lsystem, {LinkedListToString} from './LSystem'
 import Turtle from './turtle'
 
@@ -26,7 +29,10 @@ const THREE = require('three');
 var uMax = .95;
 var numCubes = 15;
 var boost = 0;
+var lowBoost = 0;
+var highBoost = 0;
 var prevBoost = 0;
+var sphere;
 
 // Array of buildings for easy access
 var cubeArr = [];
@@ -35,6 +41,18 @@ var cubeArr = [];
 var rVal = 249
 var gVal = 228
 var bVal = 255
+
+var wfRed = 205/255
+var wfGreen = 33/255
+var wfBlue = 42/255
+
+var pastelColors = []
+pastelColors.push(0xdbb1ea) //purple
+pastelColors.push(0xFAB1FF) //pink
+pastelColors.push(0xb4b1ff) //violet
+pastelColors.push(0xb1e5ff) //blue
+
+
 
 var iso;
 var wireIso;
@@ -117,9 +135,19 @@ var t = new Torus();
 scene.add(t)
 t.position.set(50, 65, 0);
 
-iso = new Icosahedron(6, 0);
+
+
+iso = new Icosahedron(6, 0, 0xb1e5ff);
 scene.add(iso)
 iso.position.set(-100, 90, 0);
+
+var lowiso = new Icosahedron(2, 0, 0xFAB1FF);
+scene.add(lowiso)
+lowiso.position.set(-100, 70, 0);
+
+var highiso = new Icosahedron(2, 0, 0xFAB1FF);
+scene.add(highiso)
+highiso.position.set(-100, 110, 0);
 
 
 wireIso = new WireframeIcosahedron(8, 0);
@@ -162,7 +190,7 @@ function doLsystem(lsystem, iterations, turtle) {
     console.log(LinkedListToString(result))
     turtle.renderSymbols(result);
     var building = turtle.getAndResetBuilding()
-    building.CreateBuildingFromRooms();
+    building.CreateBuildingFromRooms(chooseColor());
     return building;
 }
 
@@ -196,13 +224,11 @@ function render (dt) {
 
   iso.rotateOnAxis(new Vector3(0,1,0), 0.05)
 
+
   if (boost != 0) {
-    var boostPercentage = ((100 - (boost * .8)) / 110) * 4
-    loopAndUpdateColor(scene, boostPercentage);
-    var scale1 = wireIsoScale * 1 + (boostPercentage * .4);
-    var scale2 = wireIsoScale * 1 + (boostPercentage * .05);
-    wireIso.scale.set(scale1, scale1, scale1)
-    wireIso2.scale.set(scale2, scale2, scale2)
+    var boostPercentage = ((100 - (boost * .8)) / 190) * 4
+    loopAndUpdateColor(scene, boostPercentage, lowBoost/100, highBoost/100);
+
   } else {
     loopAndUpdatePositions(scene);
   }
@@ -223,24 +249,53 @@ function render (dt) {
 function loopAndUpdatePositions(scene) {
   for (var cInd = 0; cInd < cubeArr.length; cInd++) {
       cubeArr[cInd].incrementU();
+      //sphere.incrementU();
   }
 }
 
-function loopAndUpdateColor(scene, boostPercentage) {
+function loopAndUpdateColor(scene, boostPercentage, low, high) {
  for (var cInd = 0; cInd < cubeArr.length; cInd++) {
-      cubeArr[cInd].incrementAndChangeColor(boostPercentage);
+      var r = 0.7 * boostPercentage
+      var g = 0.5 * boostPercentage
+      var b = boostPercentage
+      cubeArr[cInd].incrementAndChangeColor(boostPercentage, r, g, b);
+      
+      //sphere.incrementU();
+
+      var lowScale = 1 + low * .8
+      var highScale = 1 + high * .8
+      lowiso.scale.set(lowScale, lowScale, lowScale)
+      highiso.scale.set(highScale, highScale, highScale)
+
+      // Iso changes
+      var scale1 = wireIsoScale * 1 + (boostPercentage * .6);
+      var scale2 = wireIsoScale * 1 + (boostPercentage * .09);
+      wireIso.scale.set(scale1, scale1, scale1)
+      wireIso2.scale.set(scale2, scale2, scale2)
+
+      var col = {r: boostPercentage, g: boostPercentage, b: boostPercentage};
+      wireIso.material.color.setRGB(r * 1.3, g, b)
+      wireIso2.material.color.setRGB(r * .7 * 1.3, g * .7, b * .7)
   }
 }
 
 function addObjectsToScene(scene, lsys) {
   var surface = new ExtrudedSurface();
 
-  var cubePathL = new CubePath(-9);
-  var cubePathR = new CubePath(9);
+  var cubePathL = new CubePath(-10);
+  var cubePathR = new CubePath(10);
+
+  // Uncomment to add sphere and sin path
+  /*var sinPath = new SinWave(30, 61);
+  sphere = new Sphere(sinPath)
+  scene.add(sphere)*/
+
+
 
   // Uncomment to add paths to scene
   //scene.add(cubePathR);
   //scene.add(cubePathL);
+  //scene.add(sinPath)
 
   for (var i = 0; i < numCubes; i++) {
 
@@ -270,6 +325,11 @@ function addObjectsToScene(scene, lsys) {
 
 function generateHeight() {
   return Math.floor((Math.random() * 8) + 1);
+}
+
+function chooseColor() {
+  //return pastelColors[Math.floor((Math.random() * 4))];
+  return 0x000000
 }
 
 
@@ -348,8 +408,15 @@ function playSound(buffer) {
     boost = 0;
     for (var i = 0; i < array.length; i++) {
         boost += array[i] * .5;
+        if (i < 300) {
+          lowBoost += array[i] * .5
+        } else {
+          highBoost += array[i] * .5
+        }
     }
     boost = boost / array.length;
+    lowBoost = lowBoost / 270;
+    highBoost = highBoost / (512 - 270);
 
   };
   source.start(0);                           // play the source now

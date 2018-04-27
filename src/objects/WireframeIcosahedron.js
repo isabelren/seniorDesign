@@ -12,6 +12,7 @@ export default class WireIcosahedron extends THREE.Object3D {
 	var mat = new THREE.LineBasicMaterial( { color: 0xffffff} );
 
 	var wireframe = new THREE.LineSegments( geo, mat );
+	this.material = mat;
 
 	this.add( wireframe );
 
